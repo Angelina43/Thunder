@@ -18,17 +18,24 @@ class UserCotroller extends Controller
 
     public function create(Request $request)
     {
+        $validated = $request->validate([
+            'username' => 'required|unique:users|regex:/^[a-zA-Z ]*$/|max:255',
+            'password' => 'required|min:6',
+        ]);
 
-        $user = new User();
-        $user->username = $request->input('username');
-        $user->password = Hash::make($request->input('password'));
-        $user->role = $request->input('role');
+        if ($validated) {
+            $user = new User();
+            $user->username = $request->input('username');
+            $user->password = Hash::make($request->input('password'));
+            $user->role = $request->input('role');
 
-        $photo = time().'.'.$request->photo->getClientOriginalExtension();
+            $photo = time() . '.' . $request->photo->getClientOriginalExtension();
 
-        $user->photo = $request->photo->move(public_path('uploads/images'), $photo);
+            $user->photo = $request->photo->move(public_path('uploads/images'), $photo);
 
-        $user->save();
+            $user->save();
+        }
+
     }
 
 }

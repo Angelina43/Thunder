@@ -10,27 +10,35 @@ class RegisterController extends Controller
 {
     public function register(Request $request)
     {
-        $user = User::create([
-            'username' => $request->username,
-            'password' => Hash::make($request->password)
+        $validated = $request->validate([
+            'username' => 'required|unique:users|regex:/^[a-zA-Z ]*$/|max:255',
+            'password' => 'required|min:6',
         ]);
 
-        $data['token'] = $user->createToken($request->username)->plainTextToken;
-        $data['user'] = $user;
+        if ($validated) {
+            $user = User::create([
+                'username' => $request->username,
+                'password' => Hash::make($request->password)
+            ]);
 
-        $response = [
-            'status' => 'success',
-            'message' => 'User is created successfully.',
-            'data' => $data,
-        ];
+            $data['token'] = $user->createToken($request->username)->plainTextToken;
+            $data['user'] = $user;
 
-        return response()->json($response, 201);
+            $response = [
+                'status' => 'success',
+                'message' => 'User is created successfully.',
+                'data' => $data,
+            ];
+
+            return response()->json($response, 201);
+        }
     }
+
     public function login(Request $request)
     {
         $user = User::where('username', $request->username)->first();
 
-        if(!$user || !Hash::check($request->password, $user->password)) {
+        if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'Invalid credentials'

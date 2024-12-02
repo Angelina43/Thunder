@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\Auth;
 
 class ProfileController extends Controller
 {
-    public function index(Request $request) {
+    public function index(Request $request)
+    {
 
         $loggedInUser = Auth::user();
 
@@ -20,16 +21,23 @@ class ProfileController extends Controller
 
         $user = User::where('username', $loggedInUser->username)->first();
 
-        if($user){
+        if ($user) {
             $response = ['status' => 'success', 'username' => $user->username, 'photo' => $user->photo];
             return response()->json($response, 200);
         }
+
+        //как отрабатывает админка
+//        if ($user->isAdmin()){
+//            $response = ['status' => 'success', 'username' => $user->username, 'role' => $user->role];
+//            return response()->json($response, 200);
+//        }
 
         $response = ['status' => 'error', 'message' => 'User not found'];
         return response()->json($response, 404);
     }
 
-    public function avatar(Request $request){
+    public function avatar(Request $request)
+    {
         $loggedInUser = Auth::user();
 
         if (!$loggedInUser) {
@@ -39,16 +47,24 @@ class ProfileController extends Controller
 
         $user = User::where('username', $loggedInUser->username)->first();
 
-        if($user){
-            $photo = time().'.'.$request->photo->getClientOriginalExtension();
+        if ($user) {
 
-            $user->photo = $request->photo->move(public_path('uploads/images'), $photo);
+            $validated = $request->validate([
+                'photo' => 'required|image|mimes:jpeg,png,jpg,gif',
+            ]);
 
-            $user->save();
+            if ($validated) {
 
-            $response = ['status' => 'success'];
+                $photo = time() . '.' . $request->photo->getClientOriginalExtension();
 
-            return response()->json($response, 200);
+                $user->photo = $request->photo->move(public_path('uploads/images'), $photo);
+
+                $user->save();
+
+                $response = ['status' => 'success'];
+
+                return response()->json($response, 200);
+            }
         }
 
         $response = ['status' => 'error', 'message' => 'User not found'];
