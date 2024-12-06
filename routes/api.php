@@ -9,9 +9,11 @@ use Illuminate\Support\Facades\Route;
 
 //админка
 Route::controller(AdminCotroller::class)->group(function() {
-    Route::post('admin/users/create', 'create')->middleware('auth:sanctum'); //создание пользователя
-    Route::get('admin/users/index', 'index')->middleware('auth:sanctum'); //просмотр всех пользователей
-    Route::delete('admin/users/delete', 'delete')->middleware('auth:sanctum'); //удаление пользователя
+    Route::post('admin/users/create', 'create')->middleware('auth:sanctum', 'admin'); //создание пользователя
+    Route::get('admin/users/index', 'index')->middleware('auth:sanctum', 'admin'); //просмотр всех пользователей
+    Route::delete('admin/users/delete', 'deleteUser')->middleware('auth:sanctum', 'admin'); //удаление пользователя
+    Route::delete('admin/posts/delete', 'deletePost')->middleware('auth:sanctum', 'admin'); //удаление поста
+    Route::delete('admin/comment/delete', 'deleteComment')->middleware('auth:sanctum', 'admin'); //удаление комментария
 });
 
 //неавторизованный пользователь

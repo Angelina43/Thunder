@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comments;
+use App\Models\Post;
 use App\Models\User;
 use http\Env\Response;
 use Illuminate\Http\Request;
@@ -63,7 +65,8 @@ class AdminCotroller extends Controller
         } else return response()->json(['status' => 'error', 'message' => 'User is not admin']);
     }
 
-    public function delete(Request $request){
+    public function deleteUser(Request $request)
+    {
         $loggedInUser = Auth::user();
 
         if (!$loggedInUser) {
@@ -75,7 +78,47 @@ class AdminCotroller extends Controller
 
         if ($user->isAdmin()) {
             $deleteUser = User::where('username', $request->username)->delete();
-            return response()->json(['status' => '200', 'message' => 'User successfully deleted']);
+            if($deleteUser){
+                return response()->json(['status' => '200', 'message' => 'User successfully deleted']);
+            } else return response()->json(['status' => 'error', 'message' => 'User is not found']);
+        } else return response()->json(['status' => 'error', 'message' => 'User is not admin']);
+    }
+
+    public function deleteComment(Request $request)
+    {
+        $loggedInUser = Auth::user();
+
+        if (!$loggedInUser) {
+            $response = ['status' => 'error', 'message' => 'User not authenticated'];
+            return response()->json($response, 401);
+        }
+
+        $user = User::where('username', $loggedInUser->username)->first();
+
+        if ($user->isAdmin()) {
+            $deleteComment = Comments::where('id', $request->id)->delete();
+            if ($deleteComment) {
+                return response()->json(['status' => '200', 'message' => 'Comment successfully deleted']);
+            } else return response()->json(['status' => 'error', 'message' => 'Comment not found']);
+        } else return response()->json(['status' => 'error', 'message' => 'User is not admin']);
+    }
+
+    public function deletePost(Request $request)
+    {
+        $loggedInUser = Auth::user();
+
+        if (!$loggedInUser) {
+            $response = ['status' => 'error', 'message' => 'User not authenticated'];
+            return response()->json($response, 401);
+        }
+
+        $user = User::where('username', $loggedInUser->username)->first();
+
+        if ($user->isAdmin()) {
+            $deletePost = Post::where('id', $request->id)->delete();
+            if ($deletePost) {
+                return response()->json(['status' => '200', 'message' => 'Post successfully deleted']);
+            } else return response()->json(['status' => 'error', 'message' => 'Post not found']);
         } else return response()->json(['status' => 'error', 'message' => 'User is not admin']);
     }
 }
