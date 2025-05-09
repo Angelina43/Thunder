@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Models\Comments;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -34,5 +35,23 @@ class PostService
         $post->save();
 
         return $post;
+    }
+
+    public function viewPosts()
+    {
+        return Post::all();
+    }
+
+    public function createComment($request, $post_id){
+        $loggedInUser = Auth::user();
+
+        $comment = new Comments();
+        $comment->post_id = $post_id;
+        $comment->user_id = $loggedInUser->id;
+        $comment->comment = $request->input('comment');
+
+        $comment->save();
+
+        return $comment;
     }
 }
