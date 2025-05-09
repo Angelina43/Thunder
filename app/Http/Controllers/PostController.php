@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Post\CreateRequest;
+use App\Http\Resources\Post\PostRecource;
 use App\Models\Comments;
 use App\Models\Post;
 use App\Models\User;
+use App\Service\PostService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
 {
@@ -19,7 +21,7 @@ class PostController extends Controller
         }
     }
 
-    public function create(Request $request)
+    public function create(CreateRequest  $request)
     {
         $loggedInUser = Auth::user();
 
@@ -28,36 +30,14 @@ class PostController extends Controller
             return response()->json($response, 401);
         }
 
-        $validated = $request->validate([
-            'text' => 'required|max:255|min:10',
-            'images' => 'required',
-            'imageName' => 'image|mimes:jpeg,png,jpg,gif',
-        ]);
+        $data = $request->validated();
 
         $user = User::where('username', $loggedInUser->username)->first();
 
         if ($user) {
-            $images = [];
+            $post = (new \App\Service\PostService)->createPost($request);
 
-            foreach ($request->file('images') as $image) {
-
-                $imageName = time() . '.' . $image->getClientOriginalExtension();
-
-                $image->move(public_path('uploads/images'), $imageName);
-
-                $images[] = $imageName;
-            }
-
-            $post = new Post();
-            $post->user_id = $loggedInUser->id;
-            $post->text = $request->input('text');
-            $post->datePublish = date('d.m.Y');
-            $post->images = json_encode($images);
-
-            $post->save();
-
-            $response = ['status' => 'success', 'username' => $user->username, 'post' => $post->text, 'images' => $images];
-            return response()->json($response, 200);
+            return PostRecource::make($post)->resolve();
 
         }
 

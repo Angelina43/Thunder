@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('password');
             $table->string('photo')->default(0);
             $table->string('role')->default(0);
-            $table->rememberToken();
         });
     }
 
