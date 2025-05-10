@@ -2,73 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Http\Requests\User\AvatarRequest;
+use App\Http\Resources\User\UserRecource;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
 
 class ProfileController extends Controller
 {
     public function index(Request $request)
     {
+        $profile = (new \App\Service\ProfileService())->profile();
 
-        $loggedInUser = Auth::user();
+        return UserRecource::make($profile)->resolve();
 
-        if (!$loggedInUser) {
-            $response = ['status' => 'error', 'message' => 'User not authenticated'];
-            return response()->json($response, 401);
-        }
-
-        $user = User::where('username', $loggedInUser->username)->first();
-
-        if ($user) {
-            $response = ['status' => 'success', 'username' => $user->username, 'photo' => $user->photo];
-            return response()->json($response, 200);
-        }
-
-        //как отрабатывает админка
-//        if ($user->isAdmin()){
-//            $response = ['status' => 'success', 'username' => $user->username, 'role' => $user->role];
-//            return response()->json($response, 200);
-//        }
-
-        $response = ['status' => 'error', 'message' => 'User not found'];
-        return response()->json($response, 404);
     }
 
-    public function avatar(Request $request)
+    public function avatar(AvatarRequest $request)
     {
-        $loggedInUser = Auth::user();
+        $request->validated();
 
-        if (!$loggedInUser) {
-            $response = ['status' => 'error', 'message' => 'User not authenticated'];
-            return response()->json($response, 401);
-        }
+        $avatar = (new \App\Service\ProfileService())->avatar($request);
 
-        $user = User::where('username', $loggedInUser->username)->first();
-
-        if ($user) {
-
-            $validated = $request->validate([
-                'photo' => 'required|image|mimes:jpeg,png,jpg,gif',
-            ]);
-
-            if ($validated) {
-
-                $photo = time() . '.' . $request->photo->getClientOriginalExtension();
-
-                $user->photo = $request->photo->move(public_path('uploads/images'), $photo);
-
-                $user->save();
-
-                $response = ['status' => 'success'];
-
-                return response()->json($response, 200);
-            }
-        }
-
-        $response = ['status' => 'error', 'message' => 'User not found'];
-        return response()->json($response, 404);
+        return UserRecource::make($avatar)->resolve();
     }
 }
 

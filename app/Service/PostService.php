@@ -4,7 +4,6 @@ namespace App\Service;
 
 use App\Models\Comments;
 use App\Models\Post;
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class PostService
