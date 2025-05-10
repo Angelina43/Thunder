@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class ProfileController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): array
     {
         $profile = (new \App\Service\ProfileService())->profile();
 
@@ -16,7 +16,7 @@ class ProfileController extends Controller
 
     }
 
-    public function avatar(AvatarRequest $request)
+    public function avatar(AvatarRequest $request): array
     {
         $request->validated();
 

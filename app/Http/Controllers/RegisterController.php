@@ -2,67 +2,35 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\User\LoginRequest;
+use App\Http\Requests\User\RegisterRequest;
+use App\Http\Resources\User\UserRecource;
 
 class RegisterController extends Controller
 {
-    public function register(Request $request)
+    public function register(RegisterRequest $request): array
     {
-        $validated = $request->validate([
-            'username' => 'required|unique:users|regex:/^[a-zA-Z ]*$/|max:255',
-            'password' => 'required|min:6',
-        ]);
+        $request->validated();
 
-        if ($validated) {
-            $user = User::create([
-                'username' => $request->username,
-                'password' => Hash::make($request->password)
-            ]);
+        $register = (new \App\Service\RegisterService())->register($request);
 
-            $data['token'] = $user->createToken($request->username)->plainTextToken;
-            $data['user'] = $user;
+        return UserRecource::make($register )->resolve();
 
-            $response = [
-                'status' => 'success',
-                'message' => 'User is created successfully.',
-                'data' => $data,
-            ];
-
-            return response()->json($response, 201);
-        }
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request): array
     {
-        $user = User::where('username', $request->username)->first();
+        $request->validated();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'Invalid credentials'
-            ], 401);
-        }
+        $login = (new \App\Service\RegisterService())->login($request);
 
-        $data['token'] = $user->createToken($request->username)->plainTextToken;
-        $data['user'] = $user;
-
-        $response = [
-            'status' => 'success',
-            'message' => 'User is logged in successfully.',
-            'data' => $data,
-        ];
-
-        return response()->json($response, 200)->header('Authorization', 'Bearer ' . $data['token']);
+        return UserRecource::make($login )->resolve();
     }
 
-    public function logout(Request $request)
+    public function logout(): array
     {
-        auth()->user()->tokens()->delete();
-        return response()->json([
-            'status' => 'success',
-            'message' => 'User is logged out successfully'
-        ], 200);
+        $logout = (new \App\Service\RegisterService())->logout();
+
+        return UserRecource::make($logout)->resolve();
     }
 }
