@@ -47,12 +47,4 @@ class User extends Authenticatable
     {
         return $this->hasMany(Comments::class);
     }
-
-    public function isAdmin()
-    {
-        if(Auth::user()->role == 1){
-            return true;
-        }
-        return false;
-    }
 }

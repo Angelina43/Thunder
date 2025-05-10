@@ -2,21 +2,22 @@
 
 namespace App\Service;
 
+
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class RegisterService
 {
     public function register($request): array
     {
-        $user = User::create([
-            'username' => $request->username,
-            'password' => Hash::make($request->password)
-        ]);
+            $user = new User();
+            $user->username = $request->input('username');
+            $user->password = Hash::make($request->input('password'));
 
-        $data['user'] = $user;
+            $data['user'] = $user;
 
-        return $data;
+            return $data;
     }
 
     public function login($request): array

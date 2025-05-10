@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Route;
 //админка
 Route::controller(AdminCotroller::class)->group(function () {
     Route::group(['middleware' => ['auth:sanctum', 'admin']], function () {
-        Route::get('admin/users/index', 'index'); //просмотр всех пользователей
+        Route::get('admin/users/view', 'view'); //просмотр всех пользователей
+        Route::post('admin/users/create', 'create'); //создание нового пользователя
         Route::delete('admin/users/delete', 'deleteUser'); //удаление пользователя
         Route::delete('admin/posts/delete', 'deletePost'); //удаление поста
         Route::delete('admin/comment/delete', 'deleteComment'); //удаление комментария
