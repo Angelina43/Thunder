@@ -25,26 +25,26 @@ class AdminCotroller extends Controller
         return UserRecource::make($register)->resolve();
     }
 
-    public function deleteUser(Request $request): array
+    public function deleteUser($user_id): array
     {
-        $delete_user = (new \App\Service\AdminService())->deleteUser($request);
+        $delete_user = (new \App\Service\AdminService())->deleteUser($user_id);
 
         return UserRecource::make($delete_user)->resolve();
     }
 
-    public function deleteComment(Request $request): array
+    public function deleteComment($comment_id): array
     {
 
-        $delete_commit = (new \App\Service\AdminService())->deleteCommit($request);
+        $delete_commit = (new \App\Service\AdminService())->deleteComment($comment_id);
 
         return UserRecource::make($delete_commit)->resolve();
 
     }
 
-    public function deletePost(Request $request): array
+    public function deletePost($post_id): array
     {
 
-        $delete_post = (new \App\Service\AdminService())->deletePost($request);
+        $delete_post = (new \App\Service\AdminService())->deletePost($post_id);
 
         return UserRecource::make($delete_post)->resolve();
 

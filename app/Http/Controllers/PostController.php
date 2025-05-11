@@ -31,4 +31,18 @@ class PostController extends Controller
         return PostRecource::make($comment)->resolve();
     }
 
+    public function deletePost($post_id): array
+    {
+        $delete_post = (new \App\Service\PostService)->deletePost($post_id);
+
+        return PostRecource::make($delete_post)->resolve();
+    }
+
+    public function deleteComment($comment_id): array
+    {
+        $delete_comment = (new \App\Service\PostService)->deleteComment($comment_id);
+
+        return PostRecource::make($delete_comment)->resolve();
+    }
+
 }

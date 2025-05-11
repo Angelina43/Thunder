@@ -29,28 +29,30 @@ class AdminService
         return $data;
     }
 
-    public function deleteUser($request): \Illuminate\Http\JsonResponse
+    public function deleteUser($user_id): array
     {
-        $deleteUser = User::where('username', $request->username)->delete();
+        $deleteUser = User::where('id', $user_id)->delete();
+
         if ($deleteUser) {
-            return response()->json(['status' => '200', 'message' => 'User successfully deleted']);
-        } else return response()->json(['status' => 'error', 'message' => 'User is not found']);
+            return ['message' => 'User successfully deleted'];
+        } else return ['message' => 'User is not found'];
     }
 
-    public function deleteCommit($request): \Illuminate\Http\JsonResponse
+    public function deleteComment($comment_id): array
     {
-        $deleteComment = Comments::where('id', $request->id)->delete();
+        $deleteComment = Comments::where('id', $comment_id)->delete();
 
         if ($deleteComment) {
-            return response()->json(['status' => '200', 'message' => 'Comment successfully deleted']);
-        } else return response()->json(['status' => 'error', 'message' => 'Comment not found']);
+            return['Comment successfully deleted'];
+        } else return ['message' => 'Comment not found'];
     }
 
-    public function deletePost($request): \Illuminate\Http\JsonResponse {
-        $deletePost = Post::where('id', $request->id)->delete();
+    public function deletePost($post_id): array
+    {
+        $deletePost = Post::where('id', $post_id)->delete();
 
         if ($deletePost) {
-            return response()->json(['status' => '200', 'message' => 'Post successfully deleted']);
-        } else return response()->json(['status' => 'error', 'message' => 'Post not found']);
+            return ['message' => 'Post successfully deleted'];
+        } else return ['message' => 'Post not found'];
     }
 }

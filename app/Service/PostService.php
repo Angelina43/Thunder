@@ -38,7 +38,17 @@ class PostService
 
     public function viewPosts()
     {
-        return Post::all();
+        return Post::with('user:id,username')
+        ->select('text', 'datePublish', 'images', 'user_id')
+        ->get()
+            ->map(function ($post) {
+                return [
+                    'username' => $post->user->username,
+                    'text' => $post->text,
+                    'datePublish' => $post->datePublish,
+                    'images' => $post->images,
+                ];
+            });
     }
 
     public function createComment($request, $post_id){
@@ -52,5 +62,29 @@ class PostService
         $comment->save();
 
         return $comment;
+    }
+
+    public function deletePost($post_id): array
+    {
+        $loggedInUser = Auth::user();
+
+        $post = $loggedInUser->posts()->find($post_id);
+
+        if ($post){
+            $post->delete();
+            return ['message' => 'Пост успешно удален'];
+        } else return ['message' => 'Пост не найден'];
+    }
+
+    public function deleteComment($comment_id): array
+    {
+        $loggedInUser = Auth::user();
+
+        $comment = $loggedInUser->comments()->find($comment_id);
+
+        if ($comment){
+            $comment->delete();
+            return ['message' => 'Коментарий успешно удален'];
+        } else return ['message' => 'Коментарий не найден'];
     }
 }
